@@ -26,16 +26,6 @@ public class Util {
         return reference;
     }
 
-    /** colors */
-    public static int manipulateColor(int color, float factor){
-        int a = (color >> 24) & 0xFF;
-        int r = (int) (((color >> 16) & 0xFF) * factor);
-        int g = (int) (((color >> 8) & 0xFF) * factor);
-        int b = (int) ((color & 0xFF) * factor);
-
-        return (a << 24) | (r << 16) | (g << 8) | b;
-    }
-
 
     /** arrays */
     public static <T> void shuffleArray(T[] a) {

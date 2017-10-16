@@ -2,6 +2,8 @@ package com.example.derek.colourmemory.gameboard;
 
 import android.support.annotation.NonNull;
 
+import com.example.derek.colourmemory.gameboard.data.Tile;
+
 import static com.example.derek.colourmemory.util.Util.checkNotNull;
 
 /**
@@ -18,7 +20,9 @@ public class GameBoardPresenter implements GameBoardContract.Presenter{
 
     @Override
     public void start() {
-        checkNotNull(mGameBoardView).setUpTiles(4, 4, 0, new int[]{0});
+        restartGame();
+        mGameBoardView.updateCurrentScore(0);
+        mGameBoardView.updateHighestScore(0);
     }
 
     @Override
@@ -43,6 +47,17 @@ public class GameBoardPresenter implements GameBoardContract.Presenter{
 
     @Override
     public void restartGame() {
+        Tile[] tiles = Tile.generateTiles(4, 4, 2);
+        checkNotNull(mGameBoardView).setUpTiles(4, 6, 0, tiles);
+    }
+
+    @Override
+    public void pauseGame() {
+
+    }
+
+    @Override
+    public void resumeGame() {
 
     }
 

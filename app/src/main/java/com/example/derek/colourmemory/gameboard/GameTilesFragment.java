@@ -1,6 +1,7 @@
 package com.example.derek.colourmemory.gameboard;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayout;
 import android.view.LayoutInflater;
@@ -10,7 +11,12 @@ import android.view.ViewGroup;
 import com.example.derek.colourmemory.R;
 import com.example.derek.colourmemory.base.BaseFragment;
 import com.example.derek.colourmemory.gameboard.componments.TileView;
+import com.example.derek.colourmemory.gameboard.data.Tile;
 import com.example.derek.colourmemory.util.Util;
+
+import junit.framework.Assert;
+
+import timber.log.Timber;
 
 import static com.example.derek.colourmemory.util.Util.checkNotNull;
 
@@ -42,8 +48,11 @@ public class GameTilesFragment extends BaseFragment implements GameBoardContract
     }
 
     @Override
-    public void setUpTiles(int row, int column, int backgroundColour, int[] colours) {
+    public void setUpTiles(int row, int column, int backgroundColour, @NonNull Tile[] tiles) {
         checkNotNull(root);
+        checkNotNull(tiles);
+        Assert.assertEquals(row * column, tiles.length);
+
         root.setRowCount(row);
         root.setColumnCount(column);
 
@@ -51,7 +60,9 @@ public class GameTilesFragment extends BaseFragment implements GameBoardContract
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < column; j++) {
                 TileView tileView = new TileView(getActivity());
-
+                int index = j + i * column;
+//                Timber.d("Getting tile at index: %d, row: %d, col: %d", index, i, j);
+                tileView.setTile(tiles[index]);
                 GridLayout.Spec rowSpec = GridLayout.spec(i, 1, 1);
                 GridLayout.Spec colSpec = GridLayout.spec(j, 1, 1);
                 GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams(rowSpec, colSpec) ;

@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">Colour Memory</string>
     <string name="action_settings">Settings</string>
+
+    <!-- game board -->
+    <string name="game_board_current_score">current score: %d</string>
+    <string name="game_board_highest_score">highest score: %d</string>
+    <string name="game_footer_control_submit">submit</string>
+    <string name="game_footer_control_restart">restart</string>
+
 </resources>

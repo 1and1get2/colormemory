@@ -1,25 +1,53 @@
 package com.example.derek.colourmemory.gameboard.data;
 
-import android.graphics.Color;
 import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
 
+import com.example.derek.colourmemory.util.ColorUtil;
 import com.example.derek.colourmemory.util.Util;
 
-import java.util.Arrays;
+import timber.log.Timber;
 
 /**
  * Created by derek on 16/10/17.
  */
 
 public class Tile {
-    private @ColorInt int forgroundColour;
+    private @ColorInt int color;
     private @ColorInt int backgorundColour;
     private int status;
     private int row;
     private int column;
 
 
-    public static class TileColors {
+    public @ColorInt int getColor() {
+        return color;
+    }
+
+    public void setColor(@ColorInt int color) {
+        this.color = color;
+    }
+
+    public static @NonNull Tile[] generateTiles(int row, int col, int tilesPerColor) {
+        if (row <= 0 || col <= 0 || tilesPerColor <= 1) throw new RuntimeException("Invalid parameter");
+        Tile[] tiles = new Tile[row * col];
+        int colorsNeeded = (int) Math.round(row * col / ((double) tilesPerColor));
+        Timber.d("generating tiles, row: %d, col: %d, tilesPerColor: %d, colorsNeeded: %d", row, col, tilesPerColor, colorsNeeded);
+
+        @ColorInt int[] colors = ColorUtil.uniqueColorGenerator(colorsNeeded);
+        for (int i = 0; i < colorsNeeded; i++) {
+            @ColorInt int color = colors[i];
+            for (int j = 0; j < tilesPerColor; j++) {
+                if (i * tilesPerColor + j > row * col - 1) break;
+                tiles[i * tilesPerColor + j] = new Tile();
+                tiles[i * tilesPerColor + j].setColor(color);
+            }
+        }
+
+        Util.shuffleArray(tiles);
+        return tiles;
+    }
+    /*public static class TileColors {
         // TODO: 16/10/17 refactor this into a color generator or move into a xml resource file
         public static final @ColorInt int Red = Color.argb(255, 255, 38, 61);
         public static final @ColorInt int Pink = Color.argb(255, 255, 0, 102);
@@ -47,5 +75,5 @@ public class Tile {
             Util.shuffleArray(candidates);
             return Arrays.copyOf(candidates, i);
         }
-    }
+    }*/
 }
