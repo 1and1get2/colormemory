@@ -3,6 +3,8 @@ package com.example.derek.colourmemory;
 import android.app.Application;
 import android.os.StrictMode;
 
+import com.squareup.leakcanary.LeakCanary;
+
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import timber.log.Timber;
@@ -15,6 +17,10 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        if (!LeakCanary.isInAnalyzerProcess(this)) {
+            LeakCanary.install(this);
+        }
 
         Realm.init(this);
         RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()

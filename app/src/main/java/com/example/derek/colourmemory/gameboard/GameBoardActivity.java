@@ -7,8 +7,9 @@ import android.widget.TextView;
 
 import com.example.derek.colourmemory.R;
 import com.example.derek.colourmemory.base.BaseActivity;
-import com.example.derek.colourmemory.gameboard.data.Tile;
 import com.example.derek.colourmemory.util.ActivityUtils;
+
+import timber.log.Timber;
 
 import static com.example.derek.colourmemory.util.Util.checkNotNull;
 
@@ -16,7 +17,7 @@ import static com.example.derek.colourmemory.util.Util.checkNotNull;
  * Created by derek on 15/10/17.
  */
 
-public class GameBoardActivity extends BaseActivity implements GameBoardContract.View, View.OnClickListener {
+public class GameBoardActivity extends BaseActivity implements GameBoardContract.GameBoardView, GameTilesFragment.OnTileClickedListener, View.OnClickListener {
     private GameTilesFragment gameTilesFragment;
     private GameBoardContract.Presenter mPresenter;
 
@@ -40,11 +41,22 @@ public class GameBoardActivity extends BaseActivity implements GameBoardContract
         submitTextView.setOnClickListener(this);
         restartTextView.setOnClickListener(this);
 
-        gameTilesFragment = GameTilesFragment.newInstance();
-        ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), gameTilesFragment, R.id.game_tile_root);
+        gameTilesFragment = (GameTilesFragment) getSupportFragmentManager().findFragmentById(R.id.game_tile_root);
+        if (gameTilesFragment == null) {
+            Timber.d("unable to find retained fragment, creating new instance");
+            gameTilesFragment = GameTilesFragment.newInstance();
+            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), gameTilesFragment, R.id.game_tile_root);
+        } else {
+            Timber.d("found and reuse retained fragment");
+        }
 
-        // TODO: 16/10/17 implement dependency injection
-        new GameBoardPresenter(this);
+        new GameBoardPresenter(this, checkNotNull(gameTilesFragment));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        getSupportFragmentManager().beginTransaction().remove(gameTilesFragment).commit();
     }
 
     @Override
@@ -67,6 +79,11 @@ public class GameBoardActivity extends BaseActivity implements GameBoardContract
     }
 
     @Override
+    public void onTileClicked(int index) {
+        checkNotNull(mPresenter).onTileClicked(index);
+    }
+
+    @Override
     public void updateHighestScore(int score) {
         checkNotNull(currentScoreTextView).setText(getString(R.string.game_board_highest_score, score));
     }
@@ -82,9 +99,10 @@ public class GameBoardActivity extends BaseActivity implements GameBoardContract
     }
 
     @Override
-    public void setUpTiles(int row, int column, int backgroundColour, Tile[] tiles) {
-        checkNotNull(gameTilesFragment).setUpTiles(row, column, backgroundColour, tiles);
+    public void updateTimer(long currentTimeMilliSecond) {
+        Timber.d("updating time: %d ms, %d s", currentTimeMilliSecond, Math.round(currentTimeMilliSecond / 1000));
     }
+
     @Override
     public void setSubmitVisibility(boolean visibility) {
         checkNotNull(submitTextView).setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
@@ -92,7 +110,8 @@ public class GameBoardActivity extends BaseActivity implements GameBoardContract
 
     @Override
     public void showSubmitScoreDialog() {
-
+        // TODO: 17/10/17
+        checkNotNull(mPresenter).submitScore("dummy");
     }
 
     @Override
